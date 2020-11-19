@@ -1,0 +1,27 @@
+﻿@model IEnumerable<MotorcycleRent.Models.Motorcycle>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1 class="text-center">Catalogue</h1>
+@if (User.IsInRole("admin"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+
+<div class="motorcycle-columns">
+    @foreach (var item in Model)
+    {
+        <a class="card" style="width: 18rem;" asp-action="Details" asp-route-id="@item.Id">
+            <img class="card-img-top" src="@Html.DisplayFor(modelItem => item.Image)" alt="@Html.DisplayFor(modelItem => item.Brand) @Html.DisplayFor(modelItem => item.Model)" />
+            <div class="card-body">
+                <h5 class="card-title">@Html.DisplayFor(modelItem => item.Model)</h5>
+                <h6 class="card-subtitle">@Html.DisplayFor(modelItem => item.Brand)</h6>
+                <p class="card-text">@Html.DisplayFor(modelItem => item.Price) €</p>
+            </div>
+        </a>
+    }
+</div>

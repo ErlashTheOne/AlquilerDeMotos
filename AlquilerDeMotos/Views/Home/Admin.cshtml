@@ -1,0 +1,66 @@
+﻿@model IEnumerable<AppUser>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<AppUser> UserManager
+    
+@{
+    ViewData["Title"] = "Admin Page"; 
+    AppUser user = await UserManager.GetUserAsync(User);
+}
+
+<h1>Admin Page</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Surname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            bool isAdmin = await UserManager.IsInRoleAsync(item, "admin");
+            bool isGod = await UserManager.IsInRoleAsync(item, "god");
+
+            @if (user.Id != item.Id || isGod == true)
+            {
+
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Surname)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        @if (!isGod)
+                        {
+                            @if (!isAdmin)
+                            {
+                                <a asp-action="UpgradeToAdmin" asp-route-id="@item.Id">Upgrade</a>}
+                            else
+                            {
+                                <a asp-action="DowngradeToUser" asp-route-id="@item.Id">Downgrade</a>
+                            }
+                        }
+                        else
+                        {
+                            <i class="fas fa-crown"></i>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

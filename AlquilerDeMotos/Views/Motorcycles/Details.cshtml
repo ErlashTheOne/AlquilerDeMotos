@@ -1,0 +1,108 @@
+﻿@model MotorcycleRent.Models.Motorcycle
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+<!--Section: Block Content-->
+<section class="mb-5">
+
+    <a asp-action="Index">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <div class="row">
+        <div class="col-md-6 mb-4 mb-md-0">
+
+            <div id="mdb-lightbox-ui"></div>
+
+            <div class="mdb-lightbox">
+
+                <div class="row product-gallery mx-1">
+
+                    <div class="col-12 mb-0">
+                        <figure class="view overlay rounded z-depth-1 main-img">
+                            <div data-size="710x823">
+                                <img src="@Html.DisplayFor(model => model.Image)" class="img-fluid z-depth-1">
+                            </div>
+                        </figure>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="col-md-6">
+
+            <h5>@Html.DisplayFor(model => model.Brand) @Html.DisplayFor(model => model.Model)</h5>
+            <p class="mb-2 text-muted text-uppercase small">Motorcycle</p>
+            <p><span class="mr-1"><strong>@Html.DisplayFor(model => model.Price) €</strong></span></p>
+            @*<p class="pt-1">
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Numquam, sapiente illo. Sit
+        error voluptas repellat rerum quidem, soluta enim perferendis voluptates laboriosam. Distinctio,
+        officia quis dolore quos sapiente tempore alias.
+        </p>*@
+            <div class="table-responsive">
+                <table class="table table-sm table-borderless mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="pl-0 w-25" scope="row"><strong>Model</strong></th>
+                            <td>@Html.DisplayFor(model => model.Model)</td>
+                        </tr>
+                        <tr>
+                            <th class="pl-0 w-25" scope="row"><strong>Year</strong></th>
+                            <td>@Html.DisplayFor(model => model.Year)</td>
+                        </tr>
+                        <tr>
+                            <th class="pl-0 w-25" scope="row"><strong>Cc</strong></th>
+                            <td>@Html.DisplayFor(model => model.Hp)</td>
+                        </tr>
+                        <tr>
+                            <th class="pl-0 w-25" scope="row"><strong>Cc</strong></th>
+                            <td>@Html.DisplayFor(model => model.Hp)</td>
+                        </tr>
+                        <tr>
+                            <th class="pl-0 w-25" scope="row"><strong>Total Km</strong></th>
+                            <td>@Html.DisplayFor(model => model.Km)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <hr>
+            @if (User.IsInRole("user") && !User.IsInRole("admin"))
+            {
+
+                @if (Model.Rented == true)
+                {
+                    <p class="alert-danger">Agotado</p>
+                }
+
+                <form asp-action="Reserve" asp-route-id="@Model.Id" method="post">
+
+                    @if (Model.Rented == false)
+                    {
+                        <div class="form-group">
+                            <label class="control-label">Days to rent:</label>
+                            <input class="form-control" name="Days" />
+                            <span asp-validation-for="Model" class="text-danger"></span>
+                        </div>
+                    }
+
+                    <input type="submit" class="btn btn-primary btn-md mr-1 mb-2" value="Rent"
+                           disabled="@(Model.Rented == true)">
+                </form>
+            }
+
+            @if (User.IsInRole("admin"))
+            {
+                <div>
+                    <a class="btn btn-primary btn-md mr-1 mb-2" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
+                    <a class="btn btn-primary btn-md mr-1 mb-2" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+                </div>
+            }
+        </div>
+    </div>
+
+</section>
+
