@@ -72,14 +72,19 @@ body {
 
 /* CUSTOM CSS*/
 
-body {
-    font-family: 'Roboto', sans-serif;
+body * {
+    font-family: 'Montserrat', sans-serif;
+}
+
+h1, h2, h3, h4, h6, h5 {
+    font-family: 'Montserrat Subrayada', sans-serif;
 }
 
 .no-btn{
     border: none;
     background: transparent;
 }
+
 .profile-pic {
     width: 25px;
     height: 25px;
@@ -87,13 +92,16 @@ body {
     border-radius: 50%;
     border: 1px solid black;
 }
+
 .text-grey{
     color: lightgrey;
 }
+
 .page-logo{
     width: 60px;
     height: auto;
 }
+
 .motorcycle-columns {
     display: flex;
     justify-content: space-around;
@@ -107,6 +115,41 @@ body {
     text-decoration: none;
     color: #212529;
 }
+
 .motorcycle-columns .card:hover {
     transform: scale(1.05);
+}
+
+.days-input {
+    display: inline-block;
+    width: 50px;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #DE312C;
+    border-color: #DE312C;
+}
+
+.btn-primary.focus, .btn-primary:focus {
+    box-shadow: 0 0 0 0.2rem #de312c80;
+}
+
+.btn-primary:hover, .btn-primary:active {
+    color: #fff;
+    background-color: #9a1c18 !important;
+    border-color: #9a1c18 !important;
+}
+
+.btn-primary.focus:hover, .btn-primary:focus:hover, .btn-primary.active:hover, .btn-primary:active:hover {
+    box-shadow: 0 0 0 0.2rem #9a1c1880;
+}
+
+a {
+    color: #DE312C;
+}
+
+a:hover {
+    color: #9a1c18;
+    text-decoration: underline;
 }

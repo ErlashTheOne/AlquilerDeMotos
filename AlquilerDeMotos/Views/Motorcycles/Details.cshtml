@@ -83,8 +83,8 @@
                     @if (Model.Rented == false)
                     {
                         <div class="form-group">
-                            <label class="control-label">Days to rent:</label>
-                            <input class="form-control" name="Days" />
+                            <label class="pl-0 w-25 control-label">Days to rent:</label>
+                            <input class="form-control days-input" name="Days" value="1"/>
                             <span asp-validation-for="Model" class="text-danger"></span>
                         </div>
                     }
