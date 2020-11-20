@@ -97,11 +97,12 @@ body {
 .motorcycle-columns {
     display: flex;
     justify-content: space-around;
-    flex-wrap: wrap;
+    flex-flow: wrap;
     align-content: flex-start;
 }
+
 .motorcycle-columns .card {
-    margin-top: 5rem;
+    margin: 2rem 0;
     transition: all 0.2s;
     text-decoration: none;
     color: #212529;

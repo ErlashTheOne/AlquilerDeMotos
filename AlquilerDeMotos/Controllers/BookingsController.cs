@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,99 +12,53 @@ using MotorcycleRent.Models;
 
 namespace MotorcycleRent.Controllers
 {
+    [Authorize(Roles = "user")]
     public class BookingsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<AppUser> _userManager;
 
-        public BookingsController(ApplicationDbContext context)
+        public BookingsController(ApplicationDbContext context, UserManager<AppUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Bookings
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Booking.ToListAsync());
+            AppUser appUser = await _userManager.GetUserAsync(User);
+            var booking = await _context.Booking.OrderBy(b => b.BookingStart).Include(a=>a.Motorcycle).Where(b => b.IdAppUser == appUser.Id).ToListAsync();
+            return View(booking);
         }
 
-        // GET: Bookings/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Pay(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var booking = await _context.Booking
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (booking == null)
-            {
-                return NotFound();
-            }
-
-            return View(booking);
-        }
-
-        // GET: Bookings/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Bookings/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,BookingStart,BookingEnd,Delivery,IdAppUser,IdMotorcycle")] Booking booking)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(booking);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(booking);
-        }
-
-        // GET: Bookings/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var booking = await _context.Booking.FindAsync(id);
-            if (booking == null)
-            {
-                return NotFound();
-            }
-            return View(booking);
-        }
-
-        // POST: Bookings/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BookingStart,BookingEnd,Delivery,IdAppUser,IdMotorcycle")] Booking booking)
-        {
-            if (id != booking.Id)
-            {
-                return NotFound();
-            }
+            var booking = await _context.Booking.FirstOrDefaultAsync(m => m.Id == id);
+            DateTime now = DateTime.Now;
+            booking.Delivery = now;
 
             if (ModelState.IsValid)
             {
                 try
                 {
                     _context.Update(booking);
+
+                    var motorcycle = await _context.Motorcycle.FirstOrDefaultAsync(m => m.Id == booking.IdMotorcycle);
+
+                    motorcycle.Rented = false;
+
+                    _context.Update(motorcycle);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BookingExists(booking.Id))
+                    if (!MotorcycleExists(booking.Id))
                     {
                         return NotFound();
                     }
@@ -116,38 +72,10 @@ namespace MotorcycleRent.Controllers
             return View(booking);
         }
 
-        // GET: Bookings/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        private bool MotorcycleExists(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var booking = await _context.Booking
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (booking == null)
-            {
-                return NotFound();
-            }
-
-            return View(booking);
+            return _context.Motorcycle.Any(e => e.Id == id);
         }
 
-        // POST: Bookings/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var booking = await _context.Booking.FindAsync(id);
-            _context.Booking.Remove(booking);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool BookingExists(int id)
-        {
-            return _context.Booking.Any(e => e.Id == id);
-        }
     }
 }

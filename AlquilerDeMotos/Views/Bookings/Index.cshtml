@@ -1,59 +1,82 @@
 ﻿@model IEnumerable<MotorcycleRent.Models.Booking>
+@using MotorcycleRent.Data
+@inject ApplicationDbContext _context
 
 @{
     ViewData["Title"] = "Index";
+    List<Motorcycle> motorcycle = _context.Motorcycle.ToList();
 }
 
-<h1>Index</h1>
+<h1>Booking</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.BookingStart)
+                @Html.DisplayNameFor(model => model.IdMotorcycle)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BookingEnd)
+                @Html.DisplayNameFor(model => model.BookingStart)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Delivery)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IdAppUser)
+                @Html.DisplayNameFor(model => model.Delivery)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IdMotorcycle)
+                @Html.DisplayNameFor(model => model.Motorcycle.Price)
             </th>
-            <th></th>
+            <th>
+
+            </th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.BookingStart)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.BookingEnd)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Delivery)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdAppUser)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdMotorcycle)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @motorcycle.Where(x => x.Id == item.IdMotorcycle).FirstOrDefault().Brand
+                    @motorcycle.Where(x => x.Id == item.IdMotorcycle).FirstOrDefault().Model
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BookingStart)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BookingEnd)
+                </td>
+                <td>
+                    @if ((item.Delivery) != Convert.ToDateTime("01/01/0001 0:00:00"))
+                    {
+                        @Html.DisplayFor(modelItem => item.Delivery)
+                    }
+                    else
+                    {
+                        <p class="alert-danger">Not delivered</p>
+                    }
+                </td>
+                <td>
+                    @if ((item.Delivery) == Convert.ToDateTime("01/01/0001 0:00:00"))
+                    {
+                        <p>
+                            @(motorcycle.Where(x => x.Id == item.IdMotorcycle).FirstOrDefault().Price*Convert.ToInt32((DateTime.Now.Date - item.BookingStart.Date).TotalDays+1))€
+                        </p>
+                    }
+                    else
+                    {
+                        <p>
+                            @(motorcycle.Where(x => x.Id == item.IdMotorcycle).FirstOrDefault().Price*Convert.ToInt32((item.Delivery.Date - item.BookingStart.Date).TotalDays+1))€
+                        </p>
+                    }
+                </td>
+                @if ((item.Delivery) == Convert.ToDateTime("01/01/0001 0:00:00"))
+                {
+                    <td>
+                        <a class="btn btn-primary btn-md mr-1 mb-2" asp-action="Pay" asp-route-id="@item.Id">Pay</a>
+                    </td>
+                }
+            </tr>
+        }
     </tbody>
 </table>

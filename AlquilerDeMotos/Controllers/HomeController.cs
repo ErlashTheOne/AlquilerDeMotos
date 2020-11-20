@@ -29,7 +29,8 @@ namespace MotorcycleRent.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return LocalRedirect("/Motorcycles");
+            //return View();
         }
 
         public IActionResult Privacy()

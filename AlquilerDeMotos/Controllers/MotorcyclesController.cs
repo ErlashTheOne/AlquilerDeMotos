@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -47,6 +48,7 @@ namespace MotorcycleRent.Controllers
         }
 
         // GET: Motorcycles/Create
+        [Authorize(Roles = "admin")]
         public IActionResult Create()
         {
             return View();
@@ -69,6 +71,7 @@ namespace MotorcycleRent.Controllers
         }
 
         // GET: Motorcycles/Edit/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -89,6 +92,7 @@ namespace MotorcycleRent.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Brand,Model,Image,Year,Cc,Hp,Price,Km,Rented")] Motorcycle motorcycle)
         {
             if (id != motorcycle.Id)
@@ -120,6 +124,7 @@ namespace MotorcycleRent.Controllers
         }
 
         // GET: Motorcycles/Delete/5
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -140,6 +145,7 @@ namespace MotorcycleRent.Controllers
         // POST: Motorcycles/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var motorcycle = await _context.Motorcycle.FindAsync(id);
@@ -154,6 +160,7 @@ namespace MotorcycleRent.Controllers
         }
 
         // Reserve
+        [Authorize(Roles = "user")]
         public async Task<IActionResult> Reserve(int? id, int days)
         {
 
@@ -172,7 +179,6 @@ namespace MotorcycleRent.Controllers
                 try
                 {
                     _context.Update(motorcycle);
-                    await _context.SaveChangesAsync();
 
                     AppUser appUser = await _userManager.GetUserAsync(User);
                     Booking booking = new Booking();
@@ -184,7 +190,7 @@ namespace MotorcycleRent.Controllers
                     booking.BookingStart = today;
                     booking.BookingEnd = today.AddDays(days);
 
-                    _context.Update(booking);
+                    _context.Add(booking);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
